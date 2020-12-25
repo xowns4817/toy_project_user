@@ -4,6 +4,7 @@
  - spring boot
     - jpa
     - security
+    - jasypt
  - jwt
  - redis
  - mariadb
