@@ -20,8 +20,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -43,7 +41,6 @@ public class UserService {
     private JwtUtil jwtUtil;
     private JPAQueryFactory jpaQueryFactory;
     private S3Service s3Service;
-    private SimpMessagingTemplate simpleMessageTemplate;
 
     @Autowired
     @Qualifier("redisTemplate_follower")
@@ -61,14 +58,12 @@ public class UserService {
                                CustomMailSender mailSender,
                                JwtUtil jwtUtil,
                                JPAQueryFactory jpaQueryFactory,
-                               S3Service s3Service,
-                               SimpMessagingTemplate simpleMessageTemplate) {
+                               S3Service s3Service) {
         this.userRepository = userRepository;
         this.mailSender = mailSender;
         this.jwtUtil = jwtUtil;
         this.jpaQueryFactory = jpaQueryFactory;
         this.s3Service = s3Service;
-        this.simpleMessageTemplate = simpleMessageTemplate;
     }
 
     public List<UserReadDto> userFindAllService( ) {
@@ -451,7 +446,6 @@ public class UserService {
             String followingKey = "user:following:" + following_id;
             setOperations.add(followedKey, following_id);
             setOperations.add(followingKey, followed_id);
-            this.simpleMessageTemplate.convertAndSend("/socket/sub/user/follow" + followed_id, 1);
         } catch (Exception e) {
             log.error("[UserService] followService Error : " + e.getMessage());
             throw new FollowFailedException();
