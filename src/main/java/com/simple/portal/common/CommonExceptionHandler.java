@@ -16,11 +16,12 @@ public class CommonExceptionHandler {
     private String profileActive;
 
     private boolean isProfileActive() {
-        if (PROFILE_DEFAULT.equals(profileActive)) {
-            return true;
-        } else {
-            return false;
-        }
+        return true;
+//        if (PROFILE_DEFAULT.equals(profileActive)) {
+//            return true;
+//        } else {
+//            return false;
+//        }
     }
   
     public static final String CODE_RE = "502";
@@ -37,14 +38,13 @@ public class CommonExceptionHandler {
         }
     }
 
-
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> runtimeException(RuntimeException e) {
         return new ResponseEntity<>(
                 ApiResponse
                         .builder()
                         .code(CODE_RE)
-                        .msg(getMag(e))
+                        .msg(e.getMessage())
                         .body(BODY_BLANK)
                         .build()
                 , HttpStatus.BAD_REQUEST);
@@ -56,7 +56,7 @@ public class CommonExceptionHandler {
                 ApiResponse
                         .builder()
                         .code(CODE_DAE)
-                        .msg(getMag(e))
+                        .msg(e.getMessage())
                         .body(BODY_BLANK)
                         .build()
                 , HttpStatus.BAD_REQUEST);
@@ -68,7 +68,7 @@ public class CommonExceptionHandler {
                 ApiResponse
                         .builder()
                         .code(CODE_E)
-                        .msg(getMag(e))
+                        .msg(e.getMessage())
                         .body(BODY_BLANK)
                         .build()
                 , HttpStatus.BAD_REQUEST);
@@ -76,23 +76,34 @@ public class CommonExceptionHandler {
 
     //유저 관련 Exception 처리 ( 500 )
     @ExceptionHandler({CreateUserFailedException.class, UpdateUserFailedException.class,
-            SelectUserFailedException.class, DeleteUserFailedException.class,
+            SelectUserFailedException.class, SelectUserPkFailedException.class, DeleteUserFailedException.class,
             IdCheckFailedException.class,
-            TokenCreateFailedException.class
+            TokenCreateFailedException.class,
+            UserAuthGrantFailedException.class,
+            EmailSendFailedException.class,
+            FindPasswordFailedException.class,
+            FollowFailedException.class,
+            UnfollowFailedException.class,
+            SelectFollowerFailedException.class, SelectFollowingUsersFailedException.class,
+            UploadProfileImgFailedException.class, DeleteProfileImgFailedException.class,
+            UpdateActivityScoreFailedException.class,
+            UpdateProfileImgFailedException.class,
+            EmailCheckFailedException.class,
+            LogoutFailedException.class,
     })
     public ResponseEntity<ApiResponse> user500Exception(Exception e) {
         return new ResponseEntity<>(
                 ApiResponse
                         .builder()
                         .code(CODE_USER)
-                        .msg(getMag(e))
+                        .msg(e.getMessage())
                         .body(BODY_BLANK)
                         .build()
                 , HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     //유저 관련 Exception 처리 ( 400 )
-    @ExceptionHandler({TokenVaildFailedException.class, ParamInvalidException.class, LoginFailedException.class})
+    @ExceptionHandler({TokenVaildFailedException.class, ParamInvalidException.class, LoginFailedException.class, UserNotFoundException.class})
     public ResponseEntity<ApiResponse> user400Exception(Exception e) {
         return new ResponseEntity<>(
                 ApiResponse
@@ -102,5 +113,18 @@ public class CommonExceptionHandler {
                         .body("")
                         .build()
                 , HttpStatus.BAD_REQUEST);
+    }
+
+    //유저 관련 Exception 처리 ( 401 - unauthorization )
+    @ExceptionHandler({UserAuthCheckFailedException.class})
+    public ResponseEntity<ApiResponse> user401Exception(Exception e) {
+        return new ResponseEntity<>(
+                ApiResponse
+                        .builder()
+                        .code(CODE_USER_C_E)
+                        .msg(e.getMessage())
+                        .body("")
+                        .build()
+                , HttpStatus.UNAUTHORIZED);
     }
 }
