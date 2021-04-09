@@ -3,7 +3,6 @@
 ### [ 기술 스택 ]
  - spring boot
     - jpa
-    - security
     - jasypt
  - jwt
  - redis
